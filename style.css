@@ -1,0 +1,263 @@
+/* Import font từ Google */
+@import url('https://fonts.googleapis.com/css2?family=Dancing+Script:wght@400..700&family=EB+Garamond:ital,wght@0,400;0,700;1,400&family=Playfair+Display:wght@400;700&display=swap');
+
+/*
+  font-family: 'Playfair Display', serif; (Tiêu đề chính)
+  font-family: 'Dancing Script', cursive; (Tiêu đề phụ, chữ ký)
+  font-family: 'EB Garamond', serif;     (Nội dung)
+*/
+
+body {
+    /* Nền gradient hồng nhạt tinh tế */
+    background: linear-gradient(180deg, #fff0f5 0%, #fdf6f8 100%);
+    font-family: 'EB Garamond', serif; /* Đổi font mặc định */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    padding: 20px;
+    overflow: hidden; 
+    box-sizing: border-box;
+    perspective: 1000px; 
+}
+
+/* -------------------- Phong bì thư -------------------- */
+.envelope-container {
+    position: relative;
+    width: 350px; 
+    height: 250px;
+    cursor: pointer;
+    z-index: 10;
+    transition: transform 1s ease-in-out;
+    /* Thêm bóng đổ mềm mại, đẹp hơn */
+    filter: drop-shadow(0 10px 15px rgba(0,0,0,0.1));
+}
+
+.envelope {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    display: flex; 
+    justify-content: center;
+    align-items: center;
+}
+
+/* Các phần của phong bì */
+.envelope-back, .envelope-front, .envelope-flap {
+    position: absolute;
+    /* Màu giấy craft ấm áp */
+    background-color: #f7f0e8; 
+}
+
+.envelope-back {
+    width: 100%;
+    height: 100%;
+    border-radius: 8px;
+    z-index: 1;
+    box-shadow: inset 0 0 10px rgba(0,0,0,0.05);
+    /* THÊM DÒNG NÀY */
+    opacity: 1;
+    transition: opacity 0.5s ease-out 1.5s; 
+}
+
+.envelope-front {
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(135deg, #f7f0e8 50%, #f2e9de 50.1%);
+    z-index: 3;
+    border-radius: 8px;
+    clip-path: polygon(0% 0%, 100% 0%, 100% 100%, 50% 70%, 0% 100%);
+    /* THÊM DÒNG NÀY */
+    opacity: 1;
+    transition: opacity 0.5s ease-out 1.5s;
+}
+
+.envelope-flap {
+    width: 100%;
+    height: 50%; 
+    background: linear-gradient(180deg, #f7f0e8 0%, #f2e9de 100%);
+    z-index: 2;
+    top: 0;
+    left: 0;
+    transform-origin: top; 
+    /* SỬA DÒNG NÀY (thêm opacity vào transition) */
+    transition: transform 0.8s ease-out, opacity 0.5s ease-out 1.5s;
+    border-radius: 0 0 8px 8px; 
+    clip-path: polygon(0% 0%, 100% 0%, 50% 100%); 
+    transform: rotateX(0deg); 
+    /* THÊM DÒNG NÀY */
+    opacity: 1;
+}
+
+/* Ẩn phong bì sau khi mở */
+.envelope-container.opened .envelope-back,
+.envelope-container.opened .envelope-front,
+.envelope-container.opened .envelope-flap {
+    opacity: 0;
+}
+
+.envelope-container.opened .envelope-flap {
+    transform: rotateX(180deg); 
+    z-index: 4; 
+    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+}
+
+/* Chỉ dẫn click (giữ nguyên) */
+.click-indicator {
+    position: absolute;
+    bottom: -40px; 
+    left: 50%;
+    transform: translateX(-50%);
+    color: #6a053c;
+    font-size: 1.2rem;
+    font-weight: bold;
+    opacity: 1;
+    transition: opacity 0.3s ease;
+    pointer-events: none; 
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+.click-indicator .arrow {
+    animation: bounce 1s infinite;
+}
+@keyframes bounce {
+    0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
+    40% { transform: translateY(-10px); }
+    60% { transform: translateY(-5px); }
+}
+.envelope-container.opened .click-indicator {
+    opacity: 0; 
+}
+
+
+/* -------------------- Lá thư (Nội dung thiệp) -------------------- */
+.card {
+    position: absolute;
+    max-width: 500px; 
+    width: 90%;
+    /* height: 80%;  */
+    top: 50%;
+    /* bottom: 0%; */
+    left: 50%;
+    transform: translate(-50%, -50%) scale(0.8); 
+    opacity: 0; 
+    visibility: hidden;
+    transition: transform 1s cubic-bezier(0.25, 0.46, 0.45, 0.94), opacity 0.8s ease;
+    
+    /* Nâng cấp nền màu nước loang lổ tự nhiên hơn */
+    background-color: #ffffff;
+    background-image: 
+        radial-gradient(circle at 15% 15%, #fcecf1 0%, transparent 30%),
+        radial-gradient(circle at 85% 25%, #fef0f5 0%, transparent 30%),
+        radial-gradient(circle at 75% 80%, #e6f7f7 0%, transparent 40%),
+        linear-gradient(135deg, #ffffff 50%, #fefefe 100%);
+
+    /* Bỏ viền cũ, dùng box-shadow để tạo viền vàng 2 lớp lấp lánh */
+    border: none;
+    box-shadow: 
+        0 0 0 5px white, /* Lớp viền trắng bên trong */
+        0 0 0 7px #e6c670, /* Lớp viền vàng chính */
+        0 0 0 8px #fcf3d9, /* Lớp highlight mỏng */
+        0 0 0 9px #e6c670, /* Lớp viền vàng ngoài */
+        10px 10px 30px rgba(0,0,0,0.15); /* Bóng đổ mềm */
+
+    border-radius: 8px;
+    padding: 30px;
+    text-align: center;
+    z-index: 2; /* Nằm dưới nắp (4) nhưng trên thân phong bì (1, 3) */
+}
+
+/* Trạng thái khi lá thư hiển thị */
+.envelope-container.opened .card {
+    opacity: 1;
+    visibility: visible;
+    transform: translate(-50%, -50%) scale(1); 
+    transition-delay: 1.5s; 
+}
+
+/* Nâng cấp nội dung chữ trong thiệp */
+h1 {
+    font-family: 'Playfair Display', serif;
+    font-size: 3.5rem; 
+    color: #d9537c;
+    margin: 0;
+    font-weight: 700;
+}
+
+h2 {
+    font-family: 'Dancing Script', cursive;
+    font-size: 1.8rem; 
+    color: #a0522d;
+    margin: -10px 0 15px 0;
+    font-weight: 700; /* Làm đậm hơn */
+}
+
+.message {
+    font-family: 'EB Garamond', serif; /* Đổi font */
+    font-size: 1.2rem; /* Tăng kích thước 1 chút */
+    color: #333;
+    line-height: 1.7;
+    margin-bottom: 20px;
+}
+
+.signature {
+    font-family: 'Dancing Script', cursive;
+    font-size: 1.5rem; 
+    color: #555;
+    font-style: italic;
+    margin-top: 15px;
+}
+
+/* Các icon trang trí (giữ nguyên) */
+.icon {
+    position: absolute;
+    font-size: 1.2rem;
+    opacity: 0.7;
+}
+.butterfly {
+    top: 30px; 
+    right: 20px;
+    transform: rotate(20deg);
+}
+.hearts {
+    bottom: 20px; 
+    right: 20px;
+}
+
+/* ---- Nâng cấp hiệu ứng hoa rơi (JS) ---- */
+.petal {
+    position: fixed;
+    top: -20px;
+    width: 12px;
+    height: 18px;
+    /* Tạo hiệu ứng mờ nhẹ để hoa chìm vào nền */
+    filter: blur(0.5px); 
+    opacity: 0.8;
+    border-radius: 0 50% 50% 50%;
+    transform: rotate(-45deg); 
+    /* Dùng 2 animation: 1 để rơi, 1 để xoay 3D */
+    animation: fall linear, flutter 3s ease-in-out infinite alternate;
+    z-index: 100; /* Luôn nằm trên cùng */
+}
+
+@keyframes fall {
+    0% {
+        top: -20px;
+        opacity: 0.8;
+    }
+    100% {
+        top: 105vh; 
+        opacity: 0;
+    }
+}
+
+@keyframes flutter {
+    0% {
+        /* var(--x-drift) sẽ được JS thêm vào */
+        transform: translateX(var(--x-drift)) rotateZ(-45deg) rotateY(0deg);
+    }
+    100% {
+        transform: translateX(calc(var(--x-drift) + 50px)) rotateZ(45deg) rotateY(180deg);
+    }
+}
