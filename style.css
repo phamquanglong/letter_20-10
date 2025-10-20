@@ -24,82 +24,131 @@ body {
 /* -------------------- Phong bì thư -------------------- */
 .envelope-container {
     position: relative;
-    width: 350px; 
-    height: 250px;
+    width: 400px;
+    height: 280px;
     cursor: pointer;
     z-index: 10;
     transition: transform 1s ease-in-out;
-    /* Thêm bóng đổ mềm mại, đẹp hơn */
-    filter: drop-shadow(0 10px 15px rgba(0,0,0,0.1));
+    filter: drop-shadow(0 15px 25px rgba(0,0,0,0.2));
 }
 
 .envelope {
     position: relative;
     width: 100%;
     height: 100%;
-    display: flex; 
+    display: flex;
     justify-content: center;
     align-items: center;
 }
 
 /* Các phần của phong bì */
-.envelope-back, .envelope-front, .envelope-flap {
+.envelope-back, .envelope-front {
     position: absolute;
-    /* Màu giấy craft ấm áp */
-    background-color: #f7f0e8; 
+    background-color: #f9f4ed;
 }
 
 .envelope-back {
     width: 100%;
     height: 100%;
-    border-radius: 8px;
+    border-radius: 5px;
     z-index: 1;
-    box-shadow: inset 0 0 10px rgba(0,0,0,0.05);
-    /* THÊM DÒNG NÀY */
+    background: linear-gradient(135deg, #f9f4ed 0%, #f5efe5 100%);
+    box-shadow:
+        inset 0 2px 5px rgba(0,0,0,0.05),
+        0 5px 15px rgba(0,0,0,0.1);
+    border: 1px solid rgba(230, 220, 200, 0.5);
     opacity: 1;
-    transition: opacity 0.5s ease-out 1.5s; 
+    transition: opacity 0.5s ease-out 1.5s;
 }
 
 .envelope-front {
     width: 100%;
     height: 100%;
-    background: linear-gradient(135deg, #f7f0e8 50%, #f2e9de 50.1%);
+    background: linear-gradient(to bottom, #f9f4ed 0%, #f5efe5 100%);
     z-index: 3;
-    border-radius: 8px;
-    clip-path: polygon(0% 0%, 100% 0%, 100% 100%, 50% 70%, 0% 100%);
-    /* THÊM DÒNG NÀY */
+    border-radius: 5px;
+    clip-path: polygon(0% 0%, 100% 0%, 100% 100%, 50% 75%, 0% 100%);
     opacity: 1;
     transition: opacity 0.5s ease-out 1.5s;
+    box-shadow:
+        inset 0 -3px 8px rgba(0,0,0,0.08),
+        0 2px 5px rgba(0,0,0,0.1);
+    border-left: 1px solid rgba(230, 220, 200, 0.6);
+    border-right: 1px solid rgba(230, 220, 200, 0.6);
+    border-bottom: 1px solid rgba(230, 220, 200, 0.6);
 }
 
+/* Nắp phong bì */
 .envelope-flap {
+    position: absolute;
     width: 100%;
-    height: 50%; 
-    background: linear-gradient(180deg, #f7f0e8 0%, #f2e9de 100%);
-    z-index: 2;
+    height: 100%;
+    z-index: 4;
     top: 0;
     left: 0;
-    transform-origin: top; 
-    /* SỬA DÒNG NÀY (thêm opacity vào transition) */
-    transition: transform 0.8s ease-out, opacity 0.5s ease-out 1.5s;
-    border-radius: 0 0 8px 8px; 
-    clip-path: polygon(0% 0%, 100% 0%, 50% 100%); 
-    transform: rotateX(0deg); 
-    /* THÊM DÒNG NÀY */
+    transform-origin: top center;
+    transition: transform 1s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.3s ease 1s;
+    transform: rotateX(0deg);
+    transform-style: preserve-3d;
     opacity: 1;
 }
 
-/* Ẩn phong bì sau khi mở */
-.envelope-container.opened .envelope-back,
-.envelope-container.opened .envelope-front,
+/* Mặt trước nắp (tam giác nhìn thấy) - Đỉnh hướng XUỐNG */
+.flap-front {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    top: 0;
+    left: 0;
+    background: linear-gradient(to bottom, #d4c4b4 0%, #e8dfd5 30%, #f2e9de 100%);
+    clip-path: polygon(0% 0%, 50% 50%, 100% 0%);
+    box-shadow:
+        0 3px 8px rgba(0,0,0,0.15),
+        inset 0 -2px 5px rgba(0,0,0,0.1);
+    border-left: 1px solid rgba(200, 180, 160, 0.4);
+    border-right: 1px solid rgba(200, 180, 160, 0.4);
+    border-top: 1px solid rgba(200, 180, 160, 0.4);
+    backface-visibility: hidden;
+    transition: box-shadow 0.5s ease;
+}
+
+/* Mặt sau nắp (khi lật) */
+.flap-back {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    top: 0;
+    left: 0;
+    background: linear-gradient(to top, #f2e9de 0%, #e8dfd5 70%, #d4c4b4 100%);
+    clip-path: polygon(0% 0%, 50% 50%, 100% 0%);
+    transform: rotateX(180deg);
+    backface-visibility: hidden;
+    box-shadow: inset 0 2px 5px rgba(0,0,0,0.1);
+}
+
+/* Animation khi mở phong bì */
+.envelope-container.opened .envelope-back {
+    opacity: 0;
+    transform: scale(0.95);
+    transition: opacity 0.6s ease 1s, transform 0.6s ease 1s;
+}
+
+.envelope-container.opened .envelope-front {
+    opacity: 0;
+    transform: translateY(10px);
+    transition: opacity 0.6s ease 1s, transform 0.6s ease 1s;
+}
+
+/* Lật nắp ra phía sau (180deg) rồi ẩn đi */
 .envelope-container.opened .envelope-flap {
+    transform: rotateX(-180deg);
     opacity: 0;
 }
 
-.envelope-container.opened .envelope-flap {
-    transform: rotateX(180deg); 
-    z-index: 4; 
-    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+.envelope-container.opened .flap-front {
+    box-shadow:
+        0 8px 20px rgba(0,0,0,0.25),
+        inset 0 -2px 5px rgba(0,0,0,0.1);
 }
 
 /* Chỉ dẫn click (giữ nguyên) */
